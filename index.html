@@ -1,160 +1,130 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🍦 Ice Cream Truck Tracker</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <title>🍦 Ice Cream Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f7f0; min-height: 100vh; padding: 16px; }
-    h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
-    .subtitle { font-size: 14px; color: #666; margin-bottom: 14px; }
-    .card { background: white; border-radius: 14px; border: 0.5px solid #e0e0e0; padding: 14px; margin-bottom: 12px; }
-    #map { width: 100%; height: 360px; border-radius: 12px; z-index: 1; }
-    #status-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-    .stat { text-align: center; }
-    .stat-val { font-size: 20px; font-weight: 600; color: #1a1a1a; }
-    .stat-lbl { font-size: 12px; color: #888; margin-top: 2px; }
-    #alert-banner { background: #EAF3DE; border: 0.5px solid #639922; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #3B6D11; display: none; align-items: center; gap: 8px; margin-bottom: 12px; }
-    #location-banner { background: #fff8e1; border: 0.5px solid #BA7517; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #854F0B; display: none; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    button { font-family: inherit; font-size: 13px; padding: 9px 16px; border-radius: 10px; border: 0.5px solid #ccc; background: white; color: #1a1a1a; cursor: pointer; }
-    button:hover { background: #f5f5f5; }
-    button.primary { background: #185FA5; color: white; border-color: #185FA5; }
-    button.primary:hover { background: #0C447C; }
-    #opt-in-panel { background: #f9f9f9; border-radius: 12px; padding: 16px; border: 0.5px solid #e0e0e0; display: none; margin-top: 12px; }
-    #opt-in-panel h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-    #opt-in-panel p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.5; }
-    .truck-dot { width: 10px; height: 10px; border-radius: 50%; background: #E24B4A; display: inline-block; margin-right: 6px; animation: blink 1s ease-in-out infinite; }
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(160deg, #fff8f0 0%, #fce4f5 100%); min-height: 100vh; padding: 20px 16px 40px; }
+    .hero { text-align: center; margin-bottom: 20px; }
+    .hero .cone { font-size: 52px; display: block; margin-bottom: 6px; animation: wobble 3s ease-in-out infinite; }
+    @keyframes wobble { 0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(5deg)} }
+    .hero h1 { font-size: 26px; font-weight: 800; color: #b5338a; margin-bottom: 4px; }
+    .hero p { font-size: 14px; color: #d17eb0; font-weight: 600; }
+    .card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(181,51,138,0.08); border: 1.5px solid #fce4f5; }
+    #map { width: 100%; height: 340px; border-radius: 14px; z-index: 1; }
+    .stats-row { display: flex; gap: 10px; justify-content: space-around; }
+    .stat-bubble { background: linear-gradient(135deg, #fff0fa, #fce4f5); border-radius: 16px; padding: 12px 16px; text-align: center; flex: 1; border: 1.5px solid #f5c6e8; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #b5338a; }
+    .stat-lbl { font-size: 11px; color: #d17eb0; font-weight: 600; margin-top: 2px; }
+    .status-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #f5a0d0; flex-shrink: 0; animation: blink 1.2s ease-in-out infinite; }
+    .status-dot.live { background: #5cb85c; animation: none; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .leaflet-container { font-family: inherit; }
+    #status-text { font-size: 14px; color: #c060a0; font-weight: 700; }
+    .alert-close { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0 4px; color: #3B6D11; }
+    #alert-banner { background: linear-gradient(135deg, #e8fcd4, #d4f5a8); border: 1.5px solid #8dc63f; border-radius: 14px; padding: 12px 14px; font-size: 14px; color: #3a6e10; display: none; align-items: center; gap: 8px; margin-bottom: 14px; font-weight: 700; }
+    #location-banner { background: #fff8e1; border: 1.5px solid #f5c842; border-radius: 14px; padding: 12px 14px; font-size: 13px; color: #8a6000; display: none; align-items: center; gap: 8px; margin-bottom: 14px; font-weight: 600; }
+    .btn { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; padding: 13px 20px; border-radius: 50px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform 0.1s; }
+    .btn:active { transform: scale(0.97); }
+    .btn-blue { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; box-shadow: 0 4px 14px rgba(59,130,246,0.3); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
-  <h1>🍦 Ice Cream Truck Tracker</h1>
-  <p class="subtitle">Find the truck in your neighborhood in real time</p>
 
-  <div id="location-banner"><i class="ti ti-alert-triangle" style="font-size:18px"></i> <span id="location-text">Getting your location...</span></div>
-  <div id="alert-banner"><i class="ti ti-bell" style="font-size:18px"></i> <span id="alert-text"></span></div>
+  <div class="hero">
+    <span class="cone">🍦</span>
+    <h1>Ice Cream Tracker!</h1>
+    <p>Find the truck before it melts away 🎵</p>
+  </div>
+
+  <div id="location-banner"><span>📍</span> <span id="location-text">Getting your location...</span></div>
+  <div id="alert-banner"><span id="alert-emoji">🚨</span> <span id="alert-text"></span> <button class="alert-close" onclick="this.parentElement.style.display='none'">✕</button></div>
 
   <div class="card" style="padding:0;overflow:hidden;">
     <div id="map"></div>
   </div>
 
-  <div class="card" id="status-bar">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span class="truck-dot" id="status-dot"></span>
-      <span id="status-text" style="font-size:14px;color:#888">Truck is offline</span>
+  <div class="card">
+    <div class="status-row">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Waiting for truck...</span>
     </div>
-    <div style="display:flex;gap:24px;">
-      <div class="stat"><div class="stat-val" id="distance-val">—</div><div class="stat-lbl">miles away</div></div>
-      <div class="stat"><div class="stat-val" id="eta-val">—</div><div class="stat-lbl">min away</div></div>
-      <div class="stat"><div class="stat-val" id="street-val">—</div><div class="stat-lbl">last seen</div></div>
+    <div class="stats-row">
+      <div class="stat-bubble"><div class="stat-val" id="distance-val">—</div><div class="stat-lbl">miles away</div></div>
+      <div class="stat-bubble"><div class="stat-val" id="eta-val">—</div><div class="stat-lbl">mins away</div></div>
+      <div class="stat-bubble"><div class="stat-val" id="street-val" style="font-size:14px;padding-top:4px">—</div><div class="stat-lbl">status</div></div>
     </div>
   </div>
 
   <div class="btn-row">
-    <button class="primary" onclick="showOptIn()"><i class="ti ti-truck"></i> I'm the ice cream truck!</button>
-    <button onclick="centerOnMe()" id="locate-btn"><i class="ti ti-current-location"></i> Find me</button>
+    <button class="btn btn-blue" onclick="centerOnMe()">📍 Find me</button>
   </div>
 
-  <div id="opt-in-panel">
-    <h3>🍦 Ice Cream Truck Sign-Up</h3>
-    <p>Turn on location sharing so kids in the neighborhood can find you on the map. Your location updates every 10 seconds and you can turn it off anytime.</p>
-    <div style="display:flex;gap:8px;">
-      <button class="primary" onclick="activateTruck()">Share my location</button>
-      <button onclick="hideOptIn()">Not now</button>
-    </div>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB48Ab1kWpQZSpJ-w8rGtd6EX0XA1VEl0Q",
+      authDomain: "icecream-tracker-2354c.firebaseapp.com",
+      databaseURL: "https://icecream-tracker-2354c-default-rtdb.firebaseio.com",
+      projectId: "icecream-tracker-2354c",
+      storageBucket: "icecream-tracker-2354c.firebasestorage.app",
+      messagingSenderId: "594442026586",
+      appId: "1:594442026586:web:2ea20d4b272e68ab906263"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
     let map, myMarker, truckMarker, myLatLng, truckLatLng;
-    let truckActive = false, truckWatchId = null;
 
     const truckIcon = L.divIcon({
-      html: '<div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))">🍦</div>',
-      className: '', iconAnchor: [16, 16]
+      html: '<div style="font-size:36px;line-height:1;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3))">🍦</div>',
+      className: '', iconAnchor: [18, 18]
     });
-
     const myIcon = L.divIcon({
-      html: '<div style="width:16px;height:16px;background:#185FA5;border:3px solid white;border-radius:50%;box-shadow:0 0 0 3px rgba(24,95,165,0.3)"></div>',
-      className: '', iconAnchor: [8, 8]
+      html: '<div style="width:18px;height:18px;background:#e044a7;border:3px solid white;border-radius:50%;box-shadow:0 0 0 4px rgba(224,68,167,0.25)"></div>',
+      className: '', iconAnchor: [9, 9]
     });
 
     function initMap(lat, lng) {
       map = L.map('map').setView([lat, lng], 16);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors', maxZoom: 19
+        attribution: '© OpenStreetMap', maxZoom: 19
       }).addTo(map);
       myLatLng = [lat, lng];
-      myMarker = L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup('You are here');
+      myMarker = L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup('📍 You are here!');
+      listenForTruck();
     }
 
-    function startMyLocation() {
-      const banner = document.getElementById('location-banner');
-      const bannerText = document.getElementById('location-text');
-      if (!navigator.geolocation) {
-        banner.style.display = 'flex';
-        bannerText.textContent = 'Your browser does not support location. Try Chrome or Safari.';
-        initMap(40.7128, -74.006);
-        return;
-      }
-      banner.style.display = 'flex';
-      bannerText.textContent = 'Getting your location — tap Allow when prompted...';
-      navigator.geolocation.watchPosition(
-        pos => {
-          banner.style.display = 'none';
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          myLatLng = [lat, lng];
-          if (!map) {
-            initMap(lat, lng);
-          } else {
-            myMarker.setLatLng([lat, lng]);
-          }
-          if (truckLatLng) updateStats();
-        },
-        err => {
-          banner.style.display = 'flex';
-          if (err.code === 1) {
-            bannerText.textContent = 'Location access denied. Go to your browser settings and allow location for this page.';
-          } else {
-            bannerText.textContent = 'Could not get your location. Make sure you have GPS on.';
-          }
-          if (!map) initMap(40.7128, -74.006);
-        },
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
-      );
-    }
-
-    function activateTruck() {
-      hideOptIn();
-      if (!navigator.geolocation) {
-        alert('Geolocation is not supported on this device.');
-        return;
-      }
-      document.getElementById('status-dot').style.background = '#639922';
-      document.getElementById('status-text').textContent = 'Truck is live — sharing location';
-      truckActive = true;
-      truckWatchId = navigator.geolocation.watchPosition(
-        pos => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          truckLatLng = [lat, lng];
-          if (!truckMarker) {
-            truckMarker = L.marker([lat, lng], { icon: truckIcon }).addTo(map).bindPopup('Ice Cream Truck 🍦');
-          } else {
-            truckMarker.setLatLng([lat, lng]);
-          }
-          if (myLatLng) updateStats();
-          map.panTo([lat, lng]);
-        },
-        err => { console.warn('Truck location error', err); },
-        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
-      );
+    function listenForTruck() {
+      const truckRef = ref(db, 'truck');
+      onValue(truckRef, snapshot => {
+        const data = snapshot.val();
+        if (!data || !data.active) {
+          document.getElementById('status-dot').classList.remove('live');
+          document.getElementById('status-text').textContent = 'Truck is offline';
+          return;
+        }
+        document.getElementById('status-dot').classList.add('live');
+        document.getElementById('status-text').textContent = 'Truck is live! 🎉';
+        const lat = data.lat, lng = data.lng;
+        truckLatLng = [lat, lng];
+        if (!truckMarker) {
+          truckMarker = L.marker([lat, lng], { icon: truckIcon }).addTo(map).bindPopup('🍦 Ice Cream Truck!');
+        } else {
+          truckMarker.setLatLng([lat, lng]);
+        }
+        if (myLatLng) updateStats();
+      });
     }
 
     function updateStats() {
@@ -163,30 +133,54 @@
       const mins = Math.max(1, Math.round(dist / 80));
       document.getElementById('distance-val').textContent = miles;
       document.getElementById('eta-val').textContent = mins;
-      const alert = document.getElementById('alert-banner');
+      const banner = document.getElementById('alert-banner');
       if (dist < 150) {
-        alert.style.display = 'flex';
-        document.getElementById('alert-text').textContent = '🚨 The truck is on your street — run outside!';
-        document.getElementById('street-val').textContent = 'Your street!';
-      } else if (dist < 400) {
-        alert.style.display = 'flex';
-        document.getElementById('alert-text').textContent = 'Getting close! The truck is ' + miles + ' miles away.';
-        document.getElementById('street-val').textContent = 'Very close';
+        banner.style.display = 'flex';
+        document.getElementById('alert-emoji').textContent = '🚨';
+        document.getElementById('alert-text').textContent = 'The truck is on your street — RUN OUTSIDE!';
+        document.getElementById('street-val').textContent = 'HERE!';
+      } else if (dist < 500) {
+        banner.style.display = 'flex';
+        document.getElementById('alert-emoji').textContent = '🎵';
+        document.getElementById('alert-text').textContent = 'Getting close! ' + miles + ' miles away!';
+        document.getElementById('street-val').textContent = 'Close!';
       } else {
-        alert.style.display = 'none';
+        banner.style.display = 'none';
         document.getElementById('street-val').textContent = 'On route';
       }
     }
 
-    function centerOnMe() {
-      if (map && myLatLng) {
-        map.setView(myLatLng, 16);
+    function startMyLocation() {
+      const banner = document.getElementById('location-banner');
+      const bannerText = document.getElementById('location-text');
+      if (!navigator.geolocation) {
+        banner.style.display = 'flex';
+        bannerText.textContent = 'Your browser does not support location.';
+        initMap(40.7128, -74.006);
+        return;
       }
+      banner.style.display = 'flex';
+      bannerText.textContent = 'Tap Allow when your browser asks for location!';
+      navigator.geolocation.watchPosition(
+        pos => {
+          banner.style.display = 'none';
+          const lat = pos.coords.latitude, lng = pos.coords.longitude;
+          myLatLng = [lat, lng];
+          if (!map) { initMap(lat, lng); } else { myMarker.setLatLng([lat, lng]); }
+          if (truckLatLng) updateStats();
+        },
+        err => {
+          banner.style.display = 'flex';
+          bannerText.textContent = err.code === 1
+            ? '🔒 Location denied. Check browser settings.'
+            : '😕 Could not get your location. Make sure GPS is on.';
+          if (!map) initMap(40.7128, -74.006);
+        },
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+      );
     }
 
-    function showOptIn() { document.getElementById('opt-in-panel').style.display = 'block'; }
-    function hideOptIn() { document.getElementById('opt-in-panel').style.display = 'none'; }
-
+    window.centerOnMe = () => { if (map && myLatLng) map.setView(myLatLng, 16); };
     window.onload = startMyLocation;
   </script>
 </body>
