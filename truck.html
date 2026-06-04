@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,40 +11,29 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Nunito', sans-serif; background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 100%); min-height: 100vh; padding: 20px 16px 40px; }
-
     .hero { text-align: center; margin-bottom: 20px; }
     .hero .emoji { font-size: 52px; display: block; margin-bottom: 6px; animation: drive 2s ease-in-out infinite alternate; }
     @keyframes drive { 0%{transform:translateX(-6px)} 100%{transform:translateX(6px)} }
     .hero h1 { font-size: 24px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px; }
     .hero p { font-size: 14px; color: #60a5fa; font-weight: 600; }
-
     .card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(29,78,216,0.08); border: 1.5px solid #dbeafe; }
-
-    #map { width: 100%; height: 320px; border-radius: 14px; z-index: 1; }
-
-    .stats-row { display: flex; gap: 10px; justify-content: space-around; }
+    #map { width: 100%; height: 300px; border-radius: 14px; z-index: 1; }
+    .stats-row { display: flex; gap: 10px; }
     .stat-bubble { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 16px; padding: 12px 16px; text-align: center; flex: 1; border: 1.5px solid #bfdbfe; }
-    .stat-val { font-size: 20px; font-weight: 800; color: #1d4ed8; }
+    .stat-val { font-size: 16px; font-weight: 800; color: #1d4ed8; }
     .stat-lbl { font-size: 11px; color: #60a5fa; font-weight: 600; margin-top: 2px; }
-
-    .status-big { text-align: center; padding: 16px; }
-    .status-big .dot-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
+    .status-center { text-align: center; padding: 10px 0 16px; }
+    .big-dot-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
     .big-dot { width: 16px; height: 16px; border-radius: 50%; background: #f5a0d0; animation: blink 1.2s ease-in-out infinite; }
     .big-dot.live { background: #22c55e; animation: none; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .status-label { font-size: 16px; font-weight: 800; color: #1d4ed8; }
-
-    .btn { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; padding: 15px 24px; border-radius: 50px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.1s; width: 100%; margin-bottom: 10px; }
+    .tip { font-size: 13px; color: #93c5fd; font-weight: 600; line-height: 1.6; }
+    .btn { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; padding: 15px 24px; border-radius: 50px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.1s; width: 100%; margin-bottom: 10px; }
     .btn:active { transform: scale(0.97); }
     .btn-green { background: linear-gradient(135deg, #4ade80, #22c55e); color: white; box-shadow: 0 4px 14px rgba(34,197,94,0.35); }
-    .btn-red { background: linear-gradient(135deg, #f87171, #ef4444); color: white; box-shadow: 0 4px 14px rgba(239,68,68,0.3); }
-    .btn-disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
-
+    .btn-red { background: linear-gradient(135deg, #f87171, #ef4444); color: white; box-shadow: 0 4px 14px rgba(239,68,68,0.3); display: none; }
     #location-banner { background: #fff8e1; border: 1.5px solid #f5c842; border-radius: 14px; padding: 12px 14px; font-size: 13px; color: #8a6000; display: none; align-items: center; gap: 8px; margin-bottom: 14px; font-weight: 600; }
-
-    .tip { font-size: 13px; color: #93c5fd; text-align: center; font-weight: 600; line-height: 1.6; }
-
-    .kids-count { font-size: 36px; font-weight: 800; color: #1d4ed8; }
   </style>
 </head>
 <body>
@@ -54,22 +44,21 @@
     <p>Let the neighborhood know you're coming!</p>
   </div>
 
-  <div id="location-banner"><span>📍</span> <span id="location-text">Getting your location...</span></div>
+  <div id="location-banner"><span>📍</span> <span id="location-text">Tap Start to go live!</span></div>
 
   <div class="card">
-    <div class="status-big">
-      <div class="dot-wrap">
+    <div class="status-center">
+      <div class="big-dot-wrap">
         <div class="big-dot" id="big-dot"></div>
         <span class="status-label" id="big-status">Not sharing yet</span>
       </div>
-      <p class="tip" id="tip-text">Start sharing so kids can track you on the map!</p>
+      <p class="tip" id="tip-text">Kids can't see you until you start sharing!</p>
     </div>
-
     <button class="btn btn-green" id="share-btn" onclick="startSharing()">🟢 Start sharing my location</button>
-    <button class="btn btn-red" id="stop-btn" onclick="stopSharing()" style="display:none">🔴 Stop sharing</button>
+    <button class="btn btn-red" id="stop-btn" onclick="stopSharing()">🔴 Stop sharing</button>
   </div>
 
-  <div class="card" style="padding: 0; overflow: hidden;">
+  <div class="card" style="padding:0;overflow:hidden;">
     <div id="map"></div>
   </div>
 
@@ -81,11 +70,27 @@
     </div>
   </div>
 
-  <p class="tip" style="margin-top: 4px;">Share the kids link 👉 <strong style="color:#1d4ed8">yoursite.github.io/icecream-tracker</strong><br>This page is just for you, the driver!</p>
+  <p class="tip" style="text-align:center;margin-top:4px;">Share the kids link 👉 <strong style="color:#1d4ed8">yourusername.github.io/icecream-tracker</strong></p>
 
-  <script>
-    let map, myMarker, watchId;
-    let isSharing = false;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB48Ab1kWpQZSpJ-w8rGtd6EX0XA1VEl0Q",
+      authDomain: "icecream-tracker-2354c.firebaseapp.com",
+      databaseURL: "https://icecream-tracker-2354c-default-rtdb.firebaseio.com",
+      projectId: "icecream-tracker-2354c",
+      storageBucket: "icecream-tracker-2354c.firebasestorage.app",
+      messagingSenderId: "594442026586",
+      appId: "1:594442026586:web:2ea20d4b272e68ab906263"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const truckRef = ref(db, 'truck');
+
+    let map, myMarker, watchId, isSharing = false;
 
     const truckIcon = L.divIcon({
       html: '<div style="font-size:36px;line-height:1;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.25))">🚚</div>',
@@ -97,10 +102,10 @@
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap', maxZoom: 19
       }).addTo(map);
-      myMarker = L.marker([lat, lng], { icon: truckIcon }).addTo(map).bindPopup('📍 You are here');
+      myMarker = L.marker([lat, lng], { icon: truckIcon }).addTo(map);
     }
 
-    function startSharing() {
+    window.startSharing = function() {
       if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
       isSharing = true;
       document.getElementById('share-btn').style.display = 'none';
@@ -108,15 +113,19 @@
       document.getElementById('big-dot').classList.add('live');
       document.getElementById('big-status').textContent = 'Live — kids can see you! 🎉';
       document.getElementById('tip-text').textContent = 'Your location updates automatically as you drive.';
+
+      onDisconnect(truckRef).set({ active: false, lat: 0, lng: 0 });
+
       watchId = navigator.geolocation.watchPosition(
         pos => {
           const lat = pos.coords.latitude, lng = pos.coords.longitude;
+          set(truckRef, { active: true, lat, lng, updated: Date.now() });
           document.getElementById('lat-val').textContent = lat.toFixed(4);
           document.getElementById('lng-val').textContent = lng.toFixed(4);
           document.getElementById('acc-val').textContent = Math.round(pos.coords.accuracy);
+          document.getElementById('location-banner').style.display = 'none';
           if (!map) { initMap(lat, lng); }
           else { myMarker.setLatLng([lat, lng]); map.panTo([lat, lng]); }
-          document.getElementById('location-banner').style.display = 'none';
         },
         err => {
           const b = document.getElementById('location-banner');
@@ -127,28 +136,24 @@
         },
         { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
       );
-    }
+    };
 
-    function stopSharing() {
+    window.stopSharing = function() {
       if (watchId) navigator.geolocation.clearWatch(watchId);
+      set(truckRef, { active: false, lat: 0, lng: 0 });
       isSharing = false;
       document.getElementById('share-btn').style.display = 'flex';
       document.getElementById('stop-btn').style.display = 'none';
       document.getElementById('big-dot').classList.remove('live');
       document.getElementById('big-status').textContent = 'Not sharing';
-      document.getElementById('tip-text').textContent = 'Start sharing so kids can track you on the map!';
-    }
+      document.getElementById('tip-text').textContent = 'Kids can\'t see you until you start sharing!';
+    };
 
     window.onload = () => {
-      const b = document.getElementById('location-banner');
-      b.style.display = 'flex';
-      document.getElementById('location-text').textContent = 'Tap "Start sharing" to go live!';
-      if (!map) {
-        navigator.geolocation.getCurrentPosition(
-          pos => { initMap(pos.coords.latitude, pos.coords.longitude); b.style.display = 'none'; },
-          () => { initMap(40.7128, -74.006); }
-        );
-      }
+      navigator.geolocation.getCurrentPosition(
+        pos => initMap(pos.coords.latitude, pos.coords.longitude),
+        () => initMap(40.7128, -74.006)
+      );
     };
   </script>
 </body>
